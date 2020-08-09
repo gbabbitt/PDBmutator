@@ -15,4 +15,4 @@ NOTE; To model all the AA replacements in the CLUSTAL alignment given (1cdw_alig
 
 NOTE: For DNA mode, script assumes numbering of nucleotides on forward chain increases (e.g. 1cdw chain b) while numbering on the reverse chain decreases (e.g.1cdw chain c).  To model all DNA substitutions at all 16 sites on the DNA segment in this file, select start position = 1, stop position = 16 and start position on reverse chain = 116
 
-ALSO NOTE: at a given position, script creates all 4 variants for a DNA substitution and all 20 variants an amino acid replacement. Thus when compared to sequence, 1 in 4 DNA subs are silent and 1 in 20 replacements are silent and do not represent any change. KEEP THEM IF YOU ARE ANALYZING ALL SEQUENCE VARIANTS. REMOVE THEM MANUALLY IF YOU ARE ANALYZING MUTANTS FROM A REFERENCE SEQUENCE. 
+ALSO NOTE: script creates the 3 possible variants for a DNA substitution at a given site of mutation and all 20 possibilities an amino acid variant. 
