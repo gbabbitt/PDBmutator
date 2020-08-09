@@ -60,37 +60,52 @@ def make_mutants():
     start = int(start)
     end = int(end)+1
     startR = int(startR)
-
+    
+    CapChain = chain.upper()
+    
     for x in range(start,end):
         mol = chimera.openModels.open(pdb_file)[0] # Opens molecule
-        rc("swapna A :%s.%s" % (x, chain))
-        y = startR - x + 1
-        rc("swapna T :%s.%s" % (y, chainR))
-        rc("write 0 %s/%s_mutA%s_chain%s.pdb" % (outdir, rID, x, chain))
+        myres = mol.findResidue(x-1) # reads residue
+        myres = str(myres)
+        print("myres=%s" % myres)
+        if(myres != "DA %s.%s" % (x, CapChain)): # swap only if nucleotides differ
+            rc("swapna A :%s.%s" % (x, chain))
+            y = startR - x + 1
+            rc("swapna T :%s.%s" % (y, chainR))
+            rc("write 0 %s/%s_mutA%s_chain%s.pdb" % (outdir, rID, x, chain))
+            file_out.write('%s_mutA%s_chain%s\n' % (rID, x, chain))
         rc("close 0")
-        file_out.write('%s_mutA%s_chain%s\n' % (rID, x, chain))
         mol = chimera.openModels.open(pdb_file)[0] # Opens molecule
-        rc("swapna T :%s.%s" % (x, chain))
-        y = startR - x + 1
-        rc("swapna A :%s.%s" % (y, chainR))
-        rc("write 0 %s/%s_mutT%s_chain%s.pdb" % (outdir, rID, x, chain))
+        myres = mol.findResidue(x-1) # reads residue
+        myres = str(myres)
+        if(myres != "DT %s.%s" % (x, CapChain)): # swap only if nucleotides differ
+            rc("swapna T :%s.%s" % (x, chain))
+            y = startR - x + 1
+            rc("swapna A :%s.%s" % (y, chainR))
+            rc("write 0 %s/%s_mutT%s_chain%s.pdb" % (outdir, rID, x, chain))
+            file_out.write('%s_mutT%s_chain%s\n' % (rID, x, chain))
         rc("close 0")
-        file_out.write('%s_mutT%s_chain%s\n' % (rID, x, chain))
         mol = chimera.openModels.open(pdb_file)[0] # Opens molecule
-        rc("swapna C :%s.%s" % (x, chain))
-        y = startR - x + 1
-        rc("swapna G :%s.%s" % (y, chainR))
-        rc("write 0 %s/%s_mutC%s_chain%s.pdb" % (outdir, rID, x, chain))
+        myres = mol.findResidue(x-1) # reads residue
+        myres = str(myres)
+        if(myres != "DC %s.%s" % (x, CapChain)): # swap only if nucleotides differ
+            rc("swapna C :%s.%s" % (x, chain))
+            y = startR - x + 1
+            rc("swapna G :%s.%s" % (y, chainR))
+            rc("write 0 %s/%s_mutC%s_chain%s.pdb" % (outdir, rID, x, chain))
+            file_out.write('%s_mutC%s_chain%s\n' % (rID, x, chain))
         rc("close 0")
-        file_out.write('%s_mutC%s_chain%s\n' % (rID, x, chain))
         mol = chimera.openModels.open(pdb_file)[0] # Opens molecule
-        rc("swapna G :%s.%s" % (x, chain))
-        y = startR - x + 1
-        rc("swapna C :%s.%s" % (y, chainR))
-        rc("write 0 %s/%s_mutG%s_chain%s.pdb" % (outdir, rID, x, chain))
+        myres = mol.findResidue(x-1) # reads residue
+        myres = str(myres)
+        if(myres != "DG %s.%s" % (x, CapChain)): # swap only if nucleotides differ
+            rc("swapna G :%s.%s" % (x, chain))
+            y = startR - x + 1
+            rc("swapna C :%s.%s" % (y, chainR))
+            rc("write 0 %s/%s_mutG%s_chain%s.pdb" % (outdir, rID, x, chain))
+            file_out.write('%s_mutG%s_chain%s\n' % (rID, x, chain))
         rc("close 0")
-        file_out.write('%s_mutG%s_chain%s\n' % (rID, x, chain))
-
+   
     file_out.close()
     return rID, outdir, startR, chainR, chain, start, end
 
