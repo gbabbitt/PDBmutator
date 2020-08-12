@@ -118,8 +118,11 @@ my $pdbFrame = $mw->Frame();
 					);
       
 # Buttons
-my $execButton = $mw -> Button(-text => "execute mutations", 
+my $execButton = $mw -> Button(-text => "execute AA replacements and deletions", 
 				-command => \&execute
+				); # Creates a main execute button
+my $sealButton = $mw -> Button(-text => "seal deletions and finalize", 
+				-command => \&seal
 				); # Creates a main execute button
 my $closeButton = $mw -> Button(-text => "close program", 
 				-command => \&close
@@ -129,6 +132,9 @@ my $closeButton = $mw -> Button(-text => "close program",
 
 #### Organize GUI Layout ####
 $closeButton->pack(-side=>"bottom",
+			-anchor=>"s"
+			);
+$sealButton->pack(-side=>"bottom",
 			-anchor=>"s"
 			);
 $execButton->pack(-side=>"bottom",
@@ -209,13 +215,12 @@ sub execute{
 mkdir($outdir);
 print("\nrunning mutator.pl script\n");
 print("number of variants = "."$Vnum\n");
+print("\nclose Chimera window when processing is complete\n\n");
 if($DNA == 1 && $ALL == 1){system("$pathID"."chimera --script \"DNAmutator_all.py --rID=$fileID --outdir=$dirID --chain=$chainID --start=$startID --end=$endID --chainR=$chainrID --startR=$startrID\"\n");}
 if($AA == 1 && $ALL == 1){system("$pathID"."chimera --script \"AAmutator_all.py --rID=$fileID --outdir=$dirID --chain=$chainID --start=$startID --end=$endID\"\n");}
 if($DNA == 1 && $ALN == 1){print "\n\n THE ALIGNMENT FILE MUST CONSIST OF PROTEIN SEQUENCES\n\n";}
 if($AA == 1 && $ALN == 1){system("$pathID"."chimera --script \"AAmutator_aln.py --rID=$fileID --outdir=$dirID --chain=$chainID --start=$startID --end=$endID --alnID=$alnID --Vnum=$Vnum\"\n");}
 
-print("\n mutator.pl complete\n\n");
-print("\nclose Chimera window to exit\n\n");
 }
 
 ###################################################################
@@ -223,9 +228,12 @@ sub list{
 print("\nprocessing .ctl files for variants from .aln file\n");   
 sleep(1);
 mkdir($outdir.'_ctl');
-print "ENTER THE NUMBER OF VARIANTS IN YOUR .aln FILE (i.e. number of rows)\n\n";
-print "put reference sequence assumed to be first row and variant sequences underneath\n\n";
-my $varnum = <STDIN>;
+mkdir($outdir.'_temp');
+print "ENTER THE NUMBER OF VARIANTS IN YOUR .aln FILE (i.e. number of rows minus one)\n\n";
+print "NOTE: reference sequence assumed in first row and variant sequences underneath\n";
+print "NOTE: reference sequence MAY NOT have gap symbols (i.e. insertions)\n";
+print "NOTE: variant sequences MAY have gap symbols (i.e. deletions)\n\n";
+$varnum = <STDIN>;
 chop($varnum);
 sleep(1);
 $Vnum = $varnum;
@@ -256,7 +264,7 @@ for (my $i = 0; $i < scalar @IN; $i++){
             $ref_letter = $refSEQ[$s];
             $seq_letter = $SEQ[$s];
             #print "$ref_letter\t"."$seq_letter\n";
-            if($ref_letter ne $seq_letter){
+            if($ref_letter ne $seq_letter && $seq_letter ne "-"){
                 print "mismatch found\t"; print "$ref_letter\t"."$seq_letter\t"."$postrack\n";
                 # convert single letter code to 3 letter code
                 if($seq_letter eq 'A'){$three_letter = "ALA"} #1
@@ -281,16 +289,42 @@ for (my $i = 0; $i < scalar @IN; $i++){
                 if($seq_letter eq 'V'){$three_letter = "VAL"} #20
                 print OUT "swapaa $three_letter :$postrack.$chainID\n";
                 }
+			if($ref_letter ne $seq_letter && $seq_letter eq "-"){
+			    print "deletion found\t"; print "$ref_letter\t"."$seq_letter\t"."$postrack\n";
+				print OUT "select :$postrack.$chainID\n";
+				print OUT "delete selected\n"; 
+				}
              }
            }
          }
 close IN;
-print OUT "write 0 $outdir/$fileID"."_variant$v"."_chain$chainID.pdb\n";
+print OUT "write 0 $outdir"."_temp/$fileID"."_temp$v"."_chain$chainID.pdb\n";
 print OUT "close 0\n";
 close OUT;
 }
 sleep(2);
 print("\nprocessing from .aln file is complete\n");   
+}
+####################################################################
+sub seal{
+sleep(1);
+print("\nIMPORTANT: remove TER lines created by your deletions in each PDB file\n");
+print("\...then resave the file and close\n\n");
+sleep(1);
+for(my $v = 0; $v <= $varnum; $v++){
+    if ($v == 0){next;}
+	system "gedit $outdir"."_temp/$fileID"."_temp$v"."_chain$chainID.pdb";
+	system "pdb4amber -i $outdir"."_temp/$fileID"."_temp$v"."_chain$chainID.pdb -o $outdir/$fileID"."_variant$v"."_chain$chainID.pdb";
+    sleep(1);
+	}
+for(my $v = 0; $v <= $varnum; $v++){
+    if ($v == 0){next;}
+unlink("$outdir"."_temp/$fileID"."_temp$v"."_chain$chainID.pdb") or die "Can't unlink $outdir"."_temp/$fileID"."_temp$v"."_chain$chainID.pdb\n";
+}
+rmdir($outdir.'_temp');
+
+print("\n PDBmutator.pl is now complete\n\n");
+
 }
 
 ####################################################################
