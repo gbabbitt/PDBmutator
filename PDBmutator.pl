@@ -10,12 +10,12 @@ use List::Util qw(min max);
 use Statistics::Descriptive();
 
 # initialize
-$refID = "1cdw_bound";
-$alnID = "1cdw_align";
+$refID = "1rex";
+$alnID = "1rex_align";
 $outdir = "pdb_mutants";
 $chainID = "a";
-$start = 155;
-$finish = 333;
+$start = 1;
+$finish = 130;
 #$chainTYPE = "DNA";  # "DNA" or "AA"
 $chimera_path = "~/.local/UCSF-Chimera64-1.14/bin/";
 
@@ -237,13 +237,31 @@ $varnum = <STDIN>;
 chop($varnum);
 sleep(1);
 $Vnum = $varnum;
-for(my $v = 0; $v <= $varnum; $v++){
-    if ($v == 0){next;}
-open(OUT, ">"."$outdir"."_ctl/variant$v.com");
-#print OUT "mol = chimera.openModels.open($fileID)[0]\n";
+# collect array of headers
 open(IN, "<"."$alnID".".aln");
 @IN = <IN>;
-print "\nprocessing variant $v\n\n";
+@headers = ();
+for (my $i = 0; $i < $varnum+3; $i++){
+	 if ($i<=2){next;}
+	 my $INrow = $IN[$i];
+     my @INrow = split (/\s+/, $INrow);
+	 my $header = $INrow[0];
+     push(@headers, $header);
+	 }
+     #print @headers;
+	 #print"\n";
+	 #exit;
+
+
+for(my $v = 0; $v <= $varnum; $v++){
+    if ($v == 0){next;}
+    my $headlabel = $headers[$v-1];
+open(OUT, ">"."$outdir"."_ctl/variant$v.com");
+#open(OUT, ">"."$outdir"."_ctl/variant$v.com");
+#print OUT "mol = chimera.openModels.open($fileID)[0]\n";
+
+
+print "\nprocessing variant $v"."_$headlabel\n\n";
 sleep(2);
 $postrack = $startID; # init position
 # write swap commands to .ctl file for each variant
@@ -256,11 +274,12 @@ for (my $i = 0; $i < scalar @IN; $i++){
      my $ref_header = $refINrow[0];
      my $sequence = $INrow[1];
      my $ref_sequence = $refINrow[1];
+	 #print "my sequence\t"."$sequence\n";
+	 #print "my ref sequence\t"."$ref_sequence\n";
      # compare residues
      if ($ref_header =~ m/$fileID/){print "\nREF $ref_header\t"."$ref_sequence\n"."SEQ $header\t"."$sequence\n";
          my @refSEQ = split (//, $ref_sequence);my @SEQ = split (//, $sequence);
-         for(my $s = 0; $s <= 50; $s++){
-            $postrack= $postrack+1;
+         for(my $s = 0; $s < 50; $s++){
             $ref_letter = $refSEQ[$s];
             $seq_letter = $SEQ[$s];
             #print "$ref_letter\t"."$seq_letter\n";
@@ -294,7 +313,8 @@ for (my $i = 0; $i < scalar @IN; $i++){
 				print OUT "select :$postrack.$chainID\n";
 				print OUT "delete selected\n"; 
 				}
-             }
+             $postrack= $postrack+1;
+			 }
            }
          }
 close IN;
