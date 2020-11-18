@@ -1,6 +1,7 @@
 # PDBmutator
 
 PDBmutator is a GUI enabled script to batch run swapna, swapaa and delete residue commands in chimera on a PDB file. It is tested on UCSF Chimera 1.14 (https://www.cgl.ucsf.edu/chimera/) installed Linux Mint 19.3. It also requires gedit, python kivy, perl-tk and pdb4amber (from AmberTools 18  https://ambermd.org/) or directly from GitHub (https://github.com/Amber-MD/pdb4amber) pdb4amber is only needed if an alignment file is used as the source of the PDB variants. 
+![image](/mutator.png)
 
 To run:
 python PDBMUTATOR.py
