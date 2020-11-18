@@ -1,7 +1,7 @@
 # PDBmutator
 
 PDBmutator is a GUI enabled script to batch run swapna, swapaa and delete residue commands in chimera on a PDB file. It is tested on UCSF Chimera 1.14 (https://www.cgl.ucsf.edu/chimera/) installed Linux Mint 19.3. It also requires gedit, python kivy, perl-tk and pdb4amber (from AmberTools 18  https://ambermd.org/) or directly from GitHub (https://github.com/Amber-MD/pdb4amber) pdb4amber is only needed if an alignment file is used as the source of the PDB variants. 
-![image](/GUI.png)
+![image](/GUI1.png)
 
 To run:
 python PDBMUTATOR.py
@@ -25,6 +25,7 @@ Within a selected range of a given chain, mutator will create all possible base 
 amino acid replacements (protein chain) and deposit all possible mutant PDB files in a directory. PDBmutator can also model all amino acid replacements present in 1 or more genetic variants aligned to a reference sequence of a CLUSTAL (.aln) file. This can be used to create structures for ortholog or paralog sequences provided the PDB file sequence
 
 You must install perl, python and UCSF Chimera.  Type 'python PDBMUTATOR.py' at terminal or command line to launch the GUI. Select the type of procedure to run (variants from protein region, DNA region, or protein alignment file and follow the directions on each GUI and Linux terminal. Example files for each procedure are given on each GUI. This includes creating all 1521 possible amino acid replacements in ubiquitin (PDB: 1ubq), creating all 49 DNA substitutions possible in the DNA bound to TATA binding protein (1cdw_bound.pdb), OR creating the 8 lysozyme paralogs in the CLUSTAL alignment (1rex_align.aln) from the PDB file 1rex.pdb.
+![image](/GUI2.png)
 
 NOTE: make sure path to chimera executable is correct for your machine on the GUI
 
